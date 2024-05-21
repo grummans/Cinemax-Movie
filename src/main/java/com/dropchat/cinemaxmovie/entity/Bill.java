@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class Bill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
+
     @Column(name = "totalMoney")
     private double totalMoney;
 
@@ -42,13 +44,24 @@ public class Bill {
     @Column(name = "id")
     private LocalDate updateTime;
 
-    @Column(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "promotionId")
     private Promotion promotion;
 
-    @Column(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "billStatusId")
     private BillStatus billStatus;
 
     @Column(name = "id")
     private boolean isActive;
 
+    //define constructor without property id
+    public Bill(double totalMoney, String tradingCode, LocalDate createTime, String name, LocalDate updateTime, boolean isActive) {
+        this.totalMoney = totalMoney;
+        this.tradingCode = tradingCode;
+        this.createTime = createTime;
+        this.name = name;
+        this.updateTime = updateTime;
+        this.isActive = isActive;
+    }
 }
