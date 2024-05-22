@@ -29,11 +29,12 @@ public class Ticket {
     @Column(name = "isActive")
     private boolean isActive;
 
-    @OneToMany(mappedBy = "ticketId")
+    @OneToMany(mappedBy = "ticket")
     private List<BillTicket> billTickets;
 
-    @OneToMany(mappedBy = "schedulesId")
-    private List<Schedule> schedules;
+    @ManyToOne
+    @JoinColumn(name = "scheduleId")
+    private Schedule schedule;
 
     @ManyToOne
     @JoinColumn(name = "seatId")

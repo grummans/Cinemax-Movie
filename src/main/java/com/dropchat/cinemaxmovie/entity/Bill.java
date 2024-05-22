@@ -1,6 +1,5 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,10 +37,10 @@ public class Bill {
     @JoinColumn(name = "userId")
     private User user;
 
-    @Column(name = "id")
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "id")
+    @Column(name = "updateTime")
     private LocalDate updateTime;
 
     @ManyToOne
@@ -52,11 +51,12 @@ public class Bill {
     @JoinColumn(name = "billStatusId")
     private BillStatus billStatus;
 
-    @Column(name = "id")
+    @Column(name = "isActive")
     private boolean isActive;
 
     //define constructor without property id
-    public Bill(double totalMoney, String tradingCode, LocalDate createTime, String name, LocalDate updateTime, boolean isActive) {
+    public Bill(double totalMoney, String tradingCode, LocalDate createTime, String name,
+                LocalDate updateTime, boolean isActive) {
         this.totalMoney = totalMoney;
         this.tradingCode = tradingCode;
         this.createTime = createTime;

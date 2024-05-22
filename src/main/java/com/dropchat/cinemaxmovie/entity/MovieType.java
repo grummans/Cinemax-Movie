@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "movieType")
+@Table(name = "MovieType")
 public class MovieType {
 
     //define field for table "MovieType"

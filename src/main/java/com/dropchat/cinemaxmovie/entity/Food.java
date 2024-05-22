@@ -30,10 +30,10 @@ public class Food {
     @Column(name = "image")
     private String image;
 
-    @Column(name = "id")
+    @Column(name = "nameOfFood")
     private String nameOfFood;
 
-    @Column(name = "id")
+    @Column(name = "isActive")
     private boolean isActive;
 
     @OneToMany(mappedBy = "food")

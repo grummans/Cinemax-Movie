@@ -35,6 +35,9 @@ public class Room {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "isActive")
+    private boolean isActive;
+
     @OneToMany(mappedBy = "room")
     private List<Schedule> schedules;
 

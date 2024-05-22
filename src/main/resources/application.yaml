@@ -1,17 +1,21 @@
 spring:
   sql:
     init:
-      mode: always
+      mode: embedded
+      data-locations: classpath:/datasource/data.sql
   datasource:
     username: root
     password: 123456
     url: jdbc:mysql://localhost:3306/movie_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
   application:
     name: Cinemax Movie
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: true
     defer-datasource-initialization: true
   main:
