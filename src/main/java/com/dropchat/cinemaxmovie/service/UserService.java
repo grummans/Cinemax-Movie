@@ -2,6 +2,7 @@ package com.dropchat.cinemaxmovie.service;
 
 import com.dropchat.cinemaxmovie.converter.EntityConverter;
 import com.dropchat.cinemaxmovie.converter.request.UserRequest;
+import com.dropchat.cinemaxmovie.converter.response.UserResponse;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.repository.UserRepository;
 import lombok.Builder;
@@ -27,11 +28,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getUsers(){
+    public List<UserResponse> getUsers(){
         return userRepository.findAll()
                 .stream()
-                .map(entityConverter::convertUserToDTO)
+                .map(entityConverter::convertEntityToDTO)
                 .toList();
     }
 
+    public UserResponse getUserById(int id){
+        return entityConverter.convertEntityToDTO(userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND")));
+    }
 }

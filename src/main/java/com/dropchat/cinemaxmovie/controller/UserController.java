@@ -1,6 +1,7 @@
 package com.dropchat.cinemaxmovie.controller;
 
 import com.dropchat.cinemaxmovie.converter.request.UserRequest;
+import com.dropchat.cinemaxmovie.converter.response.UserResponse;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.service.UserService;
 import lombok.Data;
@@ -25,8 +26,13 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsers(){
+    public List<UserResponse> getUsers(){
         return userService.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    public UserResponse getUser(@PathVariable(value = "userId") int id){
+        return userService.getUserById(id);
     }
 
 }

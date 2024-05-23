@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class ConfirmEmail {
 
     @ManyToOne
     @JoinColumn(name = "userId")
+    @JsonBackReference("confirmEmail-user")
     private User user;
 
 }

@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class Role {
     private String roleName;
 
     @OneToMany(mappedBy = "role")
+    @JsonManagedReference("user-role")
     private List<User> users;
 
 }

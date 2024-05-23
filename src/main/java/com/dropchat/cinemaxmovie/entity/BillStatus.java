@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class BillStatus {
     private String name;
 
     @OneToMany(mappedBy = "billStatus")
+    @JsonManagedReference("bill-billStatus")
     private List<Bill> bills;
 
     //define constructor without property id

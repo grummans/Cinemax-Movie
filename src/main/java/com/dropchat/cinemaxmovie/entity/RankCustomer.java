@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,9 +33,11 @@ public class RankCustomer {
     private boolean isActive;
 
     @OneToMany(mappedBy = "rankCustomer")
+    @JsonManagedReference("promotion-rankCustomer")
     private List<Promotion> promotions;
 
     @OneToMany(mappedBy = "rankCustomer")
+    @JsonManagedReference("user-rankCustomer")
     private List<User> users;
 
 }

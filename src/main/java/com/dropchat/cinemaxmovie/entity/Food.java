@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class Food {
     private boolean isActive;
 
     @OneToMany(mappedBy = "food")
+    @JsonManagedReference("food-billFood")
     private List<BillFood> billFoods;
 
     //define constructor without property id

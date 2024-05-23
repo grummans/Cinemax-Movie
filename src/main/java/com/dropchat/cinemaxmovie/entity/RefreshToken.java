@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class RefreshToken {
 
     @ManyToOne
     @JoinColumn(name = "userId")
+    @JsonBackReference("refreshToken-user")
     private User user;
 
 }

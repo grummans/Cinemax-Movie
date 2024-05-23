@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,16 +44,18 @@ public class Bill {
     @Column(name = "updateTime")
     private LocalDate updateTime;
 
+    @Column(name = "isActive")
+    private boolean isActive;
+
     @ManyToOne
     @JoinColumn(name = "promotionId")
+    @JsonBackReference("bill-promotion")
     private Promotion promotion;
 
     @ManyToOne
     @JoinColumn(name = "billStatusId")
+    @JsonBackReference("bill-billStatus")
     private BillStatus billStatus;
-
-    @Column(name = "isActive")
-    private boolean isActive;
 
     //define constructor without property id
     public Bill(double totalMoney, String tradingCode, LocalDate createTime, String name,

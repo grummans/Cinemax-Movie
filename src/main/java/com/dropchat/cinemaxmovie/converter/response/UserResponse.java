@@ -1,22 +1,21 @@
 package com.dropchat.cinemaxmovie.converter.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserResponse {
 
+    int id;
     private int point;
     private String username;
     private String email;
     private String name;
     private String phoneNumber;
-    private String roleName;
-    private String rankName;
+    private String role;
+    private String rank;
 
 }

@@ -10,6 +10,8 @@ import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Data
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true)
@@ -19,9 +21,11 @@ public class EntityConverter {
 
     private ModelMapper modelMapper;
 
-    private UserResponse convertEntityToDTO(User user){
+    public UserResponse convertEntityToDTO(User user){
         var userResponse = modelMapper.map(user, UserResponse.class);
-        
+        userResponse.setRole(user.getRole().getRoleName());
+        userResponse.setRank(user.getRankCustomer().getName());
+        return userResponse;
     }
 
     public User convertDTOToEntity(UserRequest request){

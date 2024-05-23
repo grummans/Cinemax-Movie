@@ -1,5 +1,7 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,14 +57,17 @@ public class Movie {
     private boolean isActive;
 
     @OneToMany(mappedBy = "movie")
+    @JsonManagedReference("schedule-movie")
     private List<Schedule> schedules;
 
     @ManyToOne
     @JoinColumn(name = "movieTypeId")
+    @JsonBackReference("movie-movieType")
     private MovieType movieType;
 
     @ManyToOne
     @JoinColumn(name = "rateId")
+    @JsonBackReference
     private Rate rate;
 
 

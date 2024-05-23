@@ -1,6 +1,8 @@
 package com.dropchat.cinemaxmovie.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,14 +44,17 @@ public class Schedule {
     private boolean isActive;
 
     @OneToMany(mappedBy = "schedule")
+    @JsonManagedReference("ticket-schedule")
     private List<Ticket> tickets;
 
     @ManyToOne
     @JoinColumn(name = "movieId")
+    @JsonBackReference("schedule-movie")
     private Movie movie;
 
     @ManyToOne
     @JoinColumn(name = "roomId")
+    @JsonBackReference("schedule-room")
     private Room room;
 
     //define constructor without property id

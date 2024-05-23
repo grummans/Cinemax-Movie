@@ -1,5 +1,7 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,23 +46,29 @@ public class User {
     private boolean isActive;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("bill-user")
     private List<Bill> bills;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("confirmEmail-user")
     private List<ConfirmEmail> confirmEmails;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("refreshToken-user")
     private List<RefreshToken> refreshTokens;
 
     @ManyToOne
     @JoinColumn(name = "userStatusId")
+    @JsonBackReference("user-userStatus")
     private UserStatus userStatus;
 
     @ManyToOne
     @JoinColumn(name = "rankCustomerId")
+    @JsonBackReference("user-rankCustomer")
     private RankCustomer rankCustomer;
 
     @ManyToOne
     @JoinColumn(name = "roleId")
+    @JsonBackReference("user-role")
     private Role role;
 }

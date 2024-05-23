@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +24,12 @@ public class BillTicket {
 
     @ManyToOne
     @JoinColumn(name = "billId")
+    @JsonBackReference("billTicket-bill")
     private Bill bill;
 
     @ManyToOne
     @JoinColumn(name = "ticketId")
+    @JsonBackReference("billTicket-ticket")
     private Ticket ticket;
 
     public BillTicket(int quantity, Bill bill, Ticket ticket) {

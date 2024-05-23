@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,6 @@ public class SeatType {
     private String nameType;
 
     @OneToMany(mappedBy = "seatType")
+    @JsonManagedReference("seat-seatType")
     private List<Seat> seats;
 }
