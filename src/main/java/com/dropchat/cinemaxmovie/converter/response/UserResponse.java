@@ -8,8 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserResponse {
-
-    int id;
+    private int id;
     private int point;
     private String username;
     private String email;
@@ -17,5 +16,4 @@ public class UserResponse {
     private String phoneNumber;
     private String role;
     private String rank;
-
 }

@@ -21,6 +21,7 @@ public class EntityConverter {
 
     private ModelMapper modelMapper;
 
+    //Covert user to UserDTO using modelMapper
     public UserResponse convertEntityToDTO(User user){
         var userResponse = modelMapper.map(user, UserResponse.class);
         userResponse.setRole(user.getRole().getRoleName());
@@ -28,6 +29,7 @@ public class EntityConverter {
         return userResponse;
     }
 
+    //Convert userDTO to User, userDTO get info from client
     public User convertDTOToEntity(UserRequest request){
         return modelMapper.map(request, User.class);
     }

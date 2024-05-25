@@ -1,4 +1,17 @@
 spring:
+  ###### Email Properties ######
+  #smtp mail properties
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: example@gmail.com
+    password: gmail_app_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   sql:
     init:
       mode: embedded
@@ -25,3 +38,4 @@ logging:
     sql: info
 server:
   port: 8080
+

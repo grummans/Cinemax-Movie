@@ -3,10 +3,9 @@ package com.dropchat.cinemaxmovie.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,6 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "User")
 public class User {
 
@@ -25,6 +25,8 @@ public class User {
     private int id;
 
     @Column(name = "point")
+    @Min(value = 0, message = "Value must be greater than or equal to 0")
+    @Max(value = 100, message = "Value must be less than or equal to 100")
     private int point;
 
     @Column(name = "username")

@@ -15,10 +15,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserRequest {
 
-    @Min(value = 0, message = "Value must be greater than or equal to 0")
-    @Max(value = 100, message = "Value must be less than or equal to 100")
-    private int point;
-
     @Size(min = 3, message = "Error code")
     private String username;
 
