@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -22,10 +23,10 @@ public class ConfirmEmail {
     private int id;
 
     @Column(name = "requiredTime")
-    private LocalDate requiredTime;
+    private String requiredTime;
 
     @Column(name = "expiredTime")
-    private LocalDate expiredTime;
+    private Date expiredTime;
 
     @Column(name = "confirmCode")
     private String confirmCode;

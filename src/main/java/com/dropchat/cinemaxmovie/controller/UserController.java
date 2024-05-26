@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,7 @@ public class UserController {
 
     //function Signup User
     @PostMapping("/signup")
-    public UserResponse createUser(@RequestBody UserRequest request){
+    public String registerUser(@RequestBody UserRequest request){
         return userService.registerUser(request);
     }
 

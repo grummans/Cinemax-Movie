@@ -4,8 +4,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: example@gmail.com
-    password: gmail_app_password
+    username: nguyenhaikiller@gmail.com
+    password: ifhcfjmsfawbvkcs
     properties:
       mail:
         smtp:
@@ -38,4 +38,8 @@ logging:
     sql: info
 server:
   port: 8080
-
+application:
+  security:
+    jwt:
+      email-verify:
+        expiration: 300000

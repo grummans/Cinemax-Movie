@@ -2,21 +2,24 @@ package com.dropchat.cinemaxmovie.util;
 
 import com.dropchat.cinemaxmovie.entity.ConfirmEmail;
 import com.dropchat.cinemaxmovie.entity.User;
+import com.dropchat.cinemaxmovie.repository.ConfirmEmailRepository;
 import com.dropchat.cinemaxmovie.service.EmailService;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true)
 public class EmailUtil {
 
-    private EmailService emailService;
+    @Value("${application.security.jwt.email-verify.expiration}")
+    private long emailExpiration;
+    private final EmailService emailService;
+    private final ConfirmEmailRepository confirmEmailRepository;
 
     /***
      * Generate a random 6 numbers OTP to verify email
@@ -34,16 +37,30 @@ public class EmailUtil {
 
     public void sendEmail(String email, String otp) {
         String subject = "Email verification";
-        String body = "your verification otp is" + otp;
+        String body = "Your verification otp is " + otp;
         emailService.sendOTPEmail(email, subject, body);
     }
 
-    public void createConfirmEmail(User user){
+    /**
+     * Method create a verification email
+     * @param user -
+     * @return
+     */
+    public ConfirmEmail createConfirmEmail(User user){
 
         ConfirmEmail confirmEmail = new ConfirmEmail();
         confirmEmail.setUser(user);
+
         //Format requiredTime
-        Date exiprationDate = new Date(100);
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss"); //Format time "HH:mm:ss"
+        String formattedExpriration = format.format(new Date()); //convert Time to String
+        confirmEmail.setRequiredTime(formattedExpriration);
+
+        confirmEmail.setExpiredTime(new Date(System.currentTimeMillis()  + emailExpiration));
+        confirmEmail.setConfirmCode(generateOTP());
+        sendEmail(user.getEmail(), confirmEmail.getConfirmCode());
+        confirmEmailRepository.save(confirmEmail);
+        return confirmEmail;
     }
 
 }

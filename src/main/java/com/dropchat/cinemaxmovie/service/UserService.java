@@ -8,6 +8,7 @@ import com.dropchat.cinemaxmovie.repository.RankCustomerRepository;
 import com.dropchat.cinemaxmovie.repository.RoleRepository;
 import com.dropchat.cinemaxmovie.repository.UserRepository;
 import com.dropchat.cinemaxmovie.repository.UserStatusRepository;
+import com.dropchat.cinemaxmovie.util.EmailUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Service
@@ -29,6 +31,7 @@ public class UserService {
     private RoleRepository roleRepository;
     private RankCustomerRepository rankCustomerRepository;
     private UserStatusRepository userStatusRepository;
+    private EmailUtil emailUtil;
 
     /**
      * Method register User
@@ -51,9 +54,12 @@ public class UserService {
         user.setRankCustomer(rankCustomerRepository.findRankNameByPoint(20)
                 .orElseThrow(() -> new RuntimeException("Data Not Found")));
 
+
+
         userRepository.save(user);
 
-
+         //Send Email Verify with OTP
+        emailUtil.createConfirmEmail(user);
         return "Please check your mailbox to verify account";
     }
 
