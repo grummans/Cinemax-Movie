@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Pattern;
+
 @Service("emailService")
 @FieldDefaults(makeFinal = true)
 @RequiredArgsConstructor
@@ -23,7 +25,6 @@ public class EmailService {
      * @param body Content of email
      * @return
      **/
-
     public void sendOTPEmail(String title, String subject, String body){
 
         try{
