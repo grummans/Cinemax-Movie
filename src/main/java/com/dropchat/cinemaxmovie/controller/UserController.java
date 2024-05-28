@@ -1,8 +1,6 @@
 package com.dropchat.cinemaxmovie.controller;
 
-import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
-import com.dropchat.cinemaxmovie.converter.request.UserRequest;
-import com.dropchat.cinemaxmovie.converter.request.VerifyDataRequest;
+import com.dropchat.cinemaxmovie.converter.request.*;
 import com.dropchat.cinemaxmovie.converter.response.ApiResponse;
 import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
@@ -35,18 +33,28 @@ public class UserController {
         return userService.registerUser(request);
     }
 
-    @PostMapping("/login")
+    @PutMapping("/login")
     public ApiResponse<AuthenticationResponse> loginUser(@RequestBody AuthenticationRequest request){
+        var result = userService.loginUser(request);
         return ApiResponse.<AuthenticationResponse>builder()
-                .result(AuthenticationResponse.builder()
-                        .authenticate("Login Successfully")
-                        .build())
+                .result(result)
                 .build();
     }
 
-    @PostMapping("/email-verify")
+    @PutMapping("/email-verify")
     public MessageResponse verifyUser(@RequestBody VerifyDataRequest request){
         return authenticationService.verifyEmail(request.getOtp());
+    }
+
+    @PutMapping("/changePassword/{username}")
+    public MessageResponse changePasswordUser(@PathVariable(value = "username") String username,
+                                   @RequestBody ResetPasswordRequest request){
+        return userService.changePasswordUser(username, request);
+    }
+
+    @PutMapping("/updateUser")
+    public MessageResponse updateUser(@RequestBody UpdateUserRequest request){
+        return userService.updateUser(request);
     }
 
     @GetMapping

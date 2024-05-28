@@ -1,12 +1,12 @@
 package com.dropchat.cinemaxmovie.service;
 
+import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.EntityConverter;
 import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
+import com.dropchat.cinemaxmovie.converter.request.ResetPasswordRequest;
+import com.dropchat.cinemaxmovie.converter.request.UpdateUserRequest;
 import com.dropchat.cinemaxmovie.converter.request.UserRequest;
-import com.dropchat.cinemaxmovie.converter.response.ApiResponse;
-import com.dropchat.cinemaxmovie.converter.response.ApplicationException;
-import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
-import com.dropchat.cinemaxmovie.converter.response.UserResponse;
+import com.dropchat.cinemaxmovie.converter.response.*;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.*;
@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationService authenticationService;
     private final ConfirmEmailRepository confirmEmailRepository;
+    private final ApplicationConfig applicationConfig;
+
     /**
      * Method register User
      * @param request get data from client
@@ -70,9 +73,9 @@ public class UserService {
         return "Please check your mailbox to verify account";
     }
 
-    public boolean loginUser(AuthenticationRequest request){
+    public AuthenticationResponse loginUser(AuthenticationRequest request){
 
-        if(!authenticationService.authenticatedUser(request))
+        if(!authenticationService.authenticatedLoginUser(request).isAuthenticate())
             throw new ApplicationException(ErrorCode.USER_INVALID);
         else {
             //Check if mail verified or not
@@ -85,17 +88,52 @@ public class UserService {
                 throw new ApplicationException(ErrorCode.USER_NOT_VERIFY);
             }
 
-//            var user = userRepository.findByUsername(request.getUsername())
-//                    .orElseThrow(() -> new RuntimeException("User Not Found"));
-//            user.setUserStatus(userStatusRepository.findNameByCode("True")
-//                    .orElseThrow(() -> new RuntimeException("Data Not Found")));
-//            user.setActive(true);
-//            userRepository.save(user);
-
         }
-        return authenticationService.authenticatedUser(request);
+        return authenticationService.authenticatedLoginUser(request);
     }
 
+    public MessageResponse changePasswordUser(String username, ResetPasswordRequest request){
+
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
+            return new MessageResponse("Password is not match. Please check again");
+        }else if (request.getCurrentPassword().equals(request.getNewPassword())){
+            return new MessageResponse("New password and current password must not be the same");
+        } else if(!request.getNewPassword().equals(request.getConfirmPassword())){
+            return new MessageResponse("Password are not the same");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return new MessageResponse("Change password successfully");
+
+    }
+
+    public MessageResponse updateUser(UpdateUserRequest request) {
+        if (userRepository.findByUsername(request.getUserName()).isPresent()) {
+            throw new ApplicationException(ErrorCode.USER_EXISTED);
+        }
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new ApplicationException(ErrorCode.USER_EXISTED);
+        }
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
+            throw new ApplicationException(ErrorCode.USER_EXISTED);
+        }
+        var current = userRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Data not found !"));
+        if (request.getPoint() == 0) request.setPoint(current.getPoint());
+        var exists = userRepository.findAll().stream()
+                .anyMatch(x ->
+                        x.getUsername().equals(request.getUserName())
+                                || x.getEmail().equals(request.getEmail())
+                );
+        if (exists) {
+            return new MessageResponse("Fail");
+        }
+        BeanUtils.copyProperties(request, current, applicationConfig.getNullPropertyNames(request));
+        userRepository.save(current);
+        return new MessageResponse("Update data success !");
+    }
 
 
     /**

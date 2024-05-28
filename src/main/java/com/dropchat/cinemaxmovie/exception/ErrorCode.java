@@ -16,6 +16,7 @@ public enum ErrorCode {
     USER_INVALID(1007, "Username or password is incorrect. Please try again"),
     USER_NOT_FOUND(1008, "Username not found"),
     USER_NOT_VERIFY(1009, "User is not verify. Please verify your account"),
+    USER_UNAUTHENTICATED(4001, "User is unauthenticated"),
     DATA_NOT_FOUND(4004, "Data not found"),
     UNCATEGORIZED_ERROR(9999, "Uncategorized exception"),
     INVALID_KEY(8888, "Uncategorized exception"),
