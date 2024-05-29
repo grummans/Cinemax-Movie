@@ -1,26 +1,26 @@
 package com.dropchat.cinemaxmovie.service;
 
 import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
+import com.dropchat.cinemaxmovie.converter.request.IntrospectRequest;
 import com.dropchat.cinemaxmovie.converter.response.ApplicationException;
 import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
+import com.dropchat.cinemaxmovie.converter.response.IntrospectResponse;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
-import com.dropchat.cinemaxmovie.entity.ConfirmEmail;
-import com.dropchat.cinemaxmovie.entity.UserStatus;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.ConfirmEmailRepository;
 import com.dropchat.cinemaxmovie.repository.UserRepository;
 import com.dropchat.cinemaxmovie.repository.UserStatusRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWTClaimNames;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
-import jakarta.persistence.EntityManager;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -54,20 +54,48 @@ public class AuthenticationService {
                 .build();
     }
 
+    public IntrospectResponse validateTokenUser(IntrospectRequest request) throws JOSEException, ParseException {
+
+        var token = request.getToken(); //get Token of user request
+
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes()); //Creates a new Message Authentication (MAC) verifier.
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        Date exprateTime = signedJWT.getJWTClaimsSet().getExpirationTime(); //Gets the expiration time (exp) claim.
+
+        var verifiedToken = signedJWT.verify(verifier); //(Boolean) Checks the signature of this JWS object with the specified verifier.
+        return IntrospectResponse.builder()
+                .valid(verifiedToken && exprateTime.after(new Date())) //Return the result
+                .build();
+    }
+
+    /**
+     * Method to generate a token when client login success
+     * @param username get client username
+     * @return a String token
+     */
     private String generateToken(String username){
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); //
-        JWTClaimsSet claimNames = new JWTClaimsSet.Builder()
-                .subject(username)
-                .issuer("dropchat")
-                .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+
+        //Create a JWT Object with header & payload
+
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); //JSON Web Signature (JWS) header. This class is immutable.
+
+
+        JWTClaimsSet claimNames = new JWTClaimsSet.Builder() //JSON Web Token (JWT) claims set. This class is immutable.
+                .subject(username) //Sets the subject (sub) claim.
+                .issuer("dropchat") //Sets the issuer (iss) claim.
+                .issueTime(new Date()) //Sets the issued-at (iat) claim.
+                .expirationTime(new Date(Instant.now() //Sets the expiration time (exp) claim.
+                        .plus(1, ChronoUnit.HOURS)
+                        .toEpochMilli()))
                 .claim("Custom Claim","Dropchat")
                 .build();
-        Payload payload = new Payload(claimNames.toJSONObject());
-        JWSObject jwsObject = new JWSObject(header, payload);
+
+        Payload payload = new Payload(claimNames.toJSONObject()); //Creates a new payload from the specified JSON object
+        JWSObject jwsObject = new JWSObject(header, payload); //JSON Web Signature (JWS) secured object with compact serialisation
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes())); //Signs this JWS object with the specified signer
+            return jwsObject.serialize(); //Serialises this JWS object to its compact format consisting of Base64URL-encoded parts delimited by period ('.') characters.
         } catch (JOSEException e) {
             throw new ApplicationException(ErrorCode.UNCATEGORIZED_ERROR);
         }

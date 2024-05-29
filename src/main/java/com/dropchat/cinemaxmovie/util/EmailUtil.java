@@ -5,10 +5,10 @@ import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.repository.ConfirmEmailRepository;
 import com.dropchat.cinemaxmovie.service.EmailService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Random;
 
@@ -16,17 +16,15 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailUtil {
 
-    @Value("${application.security.jwt.email-verify.expiration}")
-    private long emailExpiration;
     private final EmailService emailService;
     private final ConfirmEmailRepository confirmEmailRepository;
-
+    private Random random = new Random();
     /***
      * Generate a random 6 numbers OTP to verify email
      * @return random OTP 6 numbers
      */
     public String generateOTP(){
-        Random random = new Random();
+        random = new Random();
         int randomNumber = random.nextInt(999999); //Random 6 numbers OTP
         String otp = String.valueOf(randomNumber); //convert to String
         while (otp.length()<6){
@@ -56,7 +54,10 @@ public class EmailUtil {
         String formattedExpriration = format.format(new Date()); //convert Time to String
         confirmEmail.setRequiredTime(formattedExpriration);
 
-        confirmEmail.setExpiredTime(new Date(System.currentTimeMillis()  + emailExpiration));
+        confirmEmail.setExpiredTime(new Date(Instant.now()
+                .plus(5, ChronoUnit.MINUTES)
+                .toEpochMilli()));
+
         confirmEmail.setConfirmCode(generateOTP());
         sendEmail(user.getEmail(), confirmEmail.getConfirmCode());
         confirmEmailRepository.save(confirmEmail);
