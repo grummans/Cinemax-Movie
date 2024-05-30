@@ -41,6 +41,11 @@ public class UserController {
                 .build();
     }
 
+    @PutMapping("/update-role")
+    public MessageResponse updateRoleUser(@RequestBody UpdateRoleRequest request){
+        return userService.changeRoleUser(request);
+    }
+
     @PutMapping("/email-verify")
     public MessageResponse verifyUser(@RequestBody VerifyDataRequest request){
         return authenticationService.verifyEmail(request.getOtp());

@@ -2,32 +2,26 @@ package com.dropchat.cinemaxmovie.service;
 
 import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.EntityConverter;
-import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
-import com.dropchat.cinemaxmovie.converter.request.ResetPasswordRequest;
-import com.dropchat.cinemaxmovie.converter.request.UpdateUserRequest;
-import com.dropchat.cinemaxmovie.converter.request.UserRequest;
+import com.dropchat.cinemaxmovie.converter.request.*;
 import com.dropchat.cinemaxmovie.converter.response.*;
+import com.dropchat.cinemaxmovie.entity.Role;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.*;
 import com.dropchat.cinemaxmovie.util.EmailUtil;
-import jakarta.mail.internet.InternetAddress;
 import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
 @Builder
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -107,6 +101,41 @@ public class UserService {
         userRepository.save(user);
         return new MessageResponse("Change password successfully");
 
+    }
+
+    public MessageResponse changeRoleUser(UpdateRoleRequest request){
+
+        var user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+        String currentRole = user.getRole().getRoleName();
+        if(currentRole.equals(formatRole(request.getRole()))){
+            return new MessageResponse("Update role failed. New role and current role are the same");
+        }
+
+        user.setRole(roleRepository.findByRoleName(formatRole(request.getRole()))
+                .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)));
+
+        userRepository.save(user);
+
+        return new MessageResponse("Update role for " + request.getUsername() + " successfully");
+    }
+
+    private String formatRole(String role){
+        switch (role){
+            case "admin":
+                role =  roleRepository.findByRoleName("ROLE_" + role.toUpperCase())
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRoleName();
+                break;
+            case "moderator":
+                role = roleRepository.findByRoleName("ROLE_"+role.toUpperCase())
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRoleName();
+                break;
+            case "user":
+                role = roleRepository.findByRoleName("ROLE_"+role.toUpperCase())
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRoleName();
+                break;
+        }
+        return role;
     }
 
     public MessageResponse updateUser(UpdateUserRequest request) {
