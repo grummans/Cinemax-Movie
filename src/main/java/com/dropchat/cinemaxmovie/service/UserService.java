@@ -4,7 +4,6 @@ import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.EntityConverter;
 import com.dropchat.cinemaxmovie.converter.request.*;
 import com.dropchat.cinemaxmovie.converter.response.*;
-import com.dropchat.cinemaxmovie.entity.Role;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.*;
@@ -119,6 +118,12 @@ public class UserService {
 
         return new MessageResponse("Update role for " + request.getUsername() + " successfully");
     }
+
+    /**
+     * Format role from client request to formatted role in the Role table
+     * @param role role from client
+     * @return formatted role "ROLE_..."
+     */
 
     private String formatRole(String role){
         switch (role){

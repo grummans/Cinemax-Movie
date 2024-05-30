@@ -1,5 +1,7 @@
 package com.dropchat.cinemaxmovie.configuration;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +13,10 @@ import java.beans.FeatureDescriptor;
 import java.util.stream.Stream;
 
 @Configuration
+@RequiredArgsConstructor
+@Slf4j
 public class ApplicationConfig {
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){
