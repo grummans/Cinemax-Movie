@@ -1,38 +1,48 @@
 package com.dropchat.cinemaxmovie.configuration;
 
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.crypto.MACSigner;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity()
+@Slf4j
 public class SecurityConfig {
 
     @Value("${application.jwt.token.Signerkey}")
     private String SIGNER_KEY;
     private final String[] PUBLIC_ENDPOINTS = {
             "/users/signup",
-            "users/login/**",
-            "/auth/introspect"
+            "/users/login",
+            "/auth/introspect",
+            "/users/my-info"
     };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                request.requestMatchers(PUBLIC_ENDPOINTS).permitAll() //Specify that URLs are allowed by anyone
+//                        .requestMatchers(HttpMethod.GET, "/users").hasAnyRole("ADMIN", "MODERATOR")
                         .anyRequest() //Maps any request.
                         .authenticated() //Specify that URLs are allowed by any authenticated user.
         );
@@ -40,7 +50,9 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 //Enables Jwt-encoded bearer token support.
                 oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.decoder(decoder()))
+                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                                        .decoder(decoder()))
+                        .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
         );
 
         httpSecurity.csrf(x -> x.disable()); //Turn off CSRF
@@ -56,6 +68,17 @@ public class SecurityConfig {
         return NimbusJwtDecoder.withSecretKey(secretKeySpec) //Use the given SecretKey to validate the MAC on a JSON Web Signature (JWS).
                 .macAlgorithm(MacAlgorithm.HS512) //Use the given algorithm  when generating the MAC
                 .build();
+    }
+
+    @Bean
+    protected JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
     }
 
     @Bean

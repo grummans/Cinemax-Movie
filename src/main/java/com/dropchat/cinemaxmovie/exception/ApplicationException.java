@@ -1,4 +1,4 @@
-package com.dropchat.cinemaxmovie.converter.response;
+package com.dropchat.cinemaxmovie.exception;
 
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import lombok.Getter;

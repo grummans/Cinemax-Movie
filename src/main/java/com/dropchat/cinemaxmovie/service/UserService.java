@@ -5,6 +5,7 @@ import com.dropchat.cinemaxmovie.converter.EntityConverter;
 import com.dropchat.cinemaxmovie.converter.request.*;
 import com.dropchat.cinemaxmovie.converter.response.*;
 import com.dropchat.cinemaxmovie.entity.User;
+import com.dropchat.cinemaxmovie.exception.ApplicationException;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.*;
 import com.dropchat.cinemaxmovie.util.EmailUtil;
@@ -12,6 +13,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -189,5 +191,17 @@ public class UserService {
     public UserResponse getUserById(int id){
         return entityConverter.convertEntityToDTO(userRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND)));
+    }
+
+    public UserResponse getMyInfo(){
+
+        var context = SecurityContextHolder.getContext().getAuthentication(); //Obtains the currently authenticated principal, or an authentication request token
+        String name = context.getName(); //Returns the name of this principal
+
+        var user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        return entityConverter.convertEntityToDTO(user);
+
     }
 }

@@ -2,7 +2,7 @@ package com.dropchat.cinemaxmovie.service;
 
 import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
 import com.dropchat.cinemaxmovie.converter.request.IntrospectRequest;
-import com.dropchat.cinemaxmovie.converter.response.ApplicationException;
+import com.dropchat.cinemaxmovie.exception.ApplicationException;
 import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
 import com.dropchat.cinemaxmovie.converter.response.IntrospectResponse;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -83,12 +84,14 @@ public class AuthenticationService {
 
         JWTClaimsSet claimNames = new JWTClaimsSet.Builder() //JSON Web Token (JWT) claims set. This class is immutable.
                 .subject(username) //Sets the subject (sub) claim.
-                .issuer("dropchat") //Sets the issuer (iss) claim.
+                .issuer("com.dropchat.JWT") //Sets the issuer (iss) claim.
                 .issueTime(new Date()) //Sets the issued-at (iat) claim.
                 .expirationTime(new Date(Instant.now() //Sets the expiration time (exp) claim.
                         .plus(1, ChronoUnit.HOURS)
                         .toEpochMilli()))
-                .claim("Custom Claim","Dropchat")
+                .jwtID(UUID.randomUUID().toString()) //Sets the JWT ID (jti) claim.
+                .claim("scope",userRepository.findByUsername(username)
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRole().getRoleName())
                 .build();
 
         Payload payload = new Payload(claimNames.toJSONObject()); //Creates a new payload from the specified JSON object

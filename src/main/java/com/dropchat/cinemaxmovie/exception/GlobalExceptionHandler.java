@@ -1,8 +1,6 @@
 package com.dropchat.cinemaxmovie.exception;
 
 import com.dropchat.cinemaxmovie.converter.response.ApiResponse;
-import com.dropchat.cinemaxmovie.converter.response.ApplicationException;
-import jakarta.mail.internet.AddressException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -38,7 +36,9 @@ public class GlobalExceptionHandler {
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity
+                .status(errorCode.getStatusCode())
+                .body(apiResponse);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
