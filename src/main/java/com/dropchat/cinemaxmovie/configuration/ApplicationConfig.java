@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.beans.FeatureDescriptor;
 import java.util.stream.Stream;
@@ -29,5 +32,15 @@ public class ApplicationConfig {
                 .map(FeatureDescriptor::getName)
                 .filter(propertyName -> wrappedSource.getPropertyValue(propertyName) == null)
                 .toArray(String[]::new);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+    public HandlerExceptionResolver handlerExceptionResolver() {
+        return new DefaultHandlerExceptionResolver();
     }
 }

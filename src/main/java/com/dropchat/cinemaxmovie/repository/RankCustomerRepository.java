@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface RankCustomerRepository extends JpaRepository<RankCustomer, Integer> {
 
+    Optional<RankCustomer> findByName(String name);
     Optional<RankCustomer> findRankNameByPoint(Integer integer);
 }

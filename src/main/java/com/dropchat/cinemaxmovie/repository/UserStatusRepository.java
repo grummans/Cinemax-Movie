@@ -9,6 +9,8 @@ import java.util.Optional;
 @Repository
 public interface UserStatusRepository extends JpaRepository<UserStatus, Integer> {
 
+    Optional<UserStatus> findByCode(String code);
+
     Optional<UserStatus> findUserStatusByCode(String code);
     Optional<UserStatus> findNameByCode(String code);
 }

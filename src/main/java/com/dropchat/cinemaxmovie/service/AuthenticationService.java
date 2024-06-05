@@ -16,6 +16,7 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +25,10 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -61,10 +62,15 @@ public class AuthenticationService {
 
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes()); //Creates a new Message Authentication (MAC) verifier.
 
-        SignedJWT signedJWT = SignedJWT.parse(token);
+        SignedJWT signedJWT = SignedJWT.parse(token); //Parses a signed JSON Web Token (JWT) from the specified string in compact format
+
+        log.warn(signedJWT.getJWTClaimsSet().getSubject());
+
         Date exprateTime = signedJWT.getJWTClaimsSet().getExpirationTime(); //Gets the expiration time (exp) claim.
 
         var verifiedToken = signedJWT.verify(verifier); //(Boolean) Checks the signature of this JWS object with the specified verifier.
+
+
         return IntrospectResponse.builder()
                 .valid(verifiedToken && exprateTime.after(new Date())) //Return the result
                 .build();
@@ -89,7 +95,6 @@ public class AuthenticationService {
                 .expirationTime(new Date(Instant.now() //Sets the expiration time (exp) claim.
                         .plus(1, ChronoUnit.HOURS)
                         .toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString()) //Sets the JWT ID (jti) claim.
                 .claim("scope",userRepository.findByUsername(username)
                         .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRole().getRoleName())
                 .build();

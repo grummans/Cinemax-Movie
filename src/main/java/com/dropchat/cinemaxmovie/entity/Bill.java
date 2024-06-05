@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class Bill {
     private String tradingCode;
 
     @Column(name = "createTime")
-    private LocalDate createTime;
+    private Date createTime;
 
     @OneToMany(mappedBy = "bill")
     private List<BillTicket> billTickets;
@@ -42,7 +43,7 @@ public class Bill {
     private String name;
 
     @Column(name = "updateTime")
-    private LocalDate updateTime;
+    private Date updateTime;
 
     @Column(name = "isActive")
     private boolean isActive;
@@ -58,8 +59,8 @@ public class Bill {
     private BillStatus billStatus;
 
     //define constructor without property id
-    public Bill(double totalMoney, String tradingCode, LocalDate createTime, String name,
-                LocalDate updateTime, boolean isActive) {
+    public Bill(double totalMoney, String tradingCode, Date createTime, String name,
+                Date updateTime, boolean isActive) {
         this.totalMoney = totalMoney;
         this.tradingCode = tradingCode;
         this.createTime = createTime;

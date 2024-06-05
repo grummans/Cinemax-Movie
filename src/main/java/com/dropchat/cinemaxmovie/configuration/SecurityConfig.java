@@ -1,6 +1,8 @@
 package com.dropchat.cinemaxmovie.configuration;
 
+import com.dropchat.cinemaxmovie.service.LogoutService;
 import com.nimbusds.jose.JWSAlgorithm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -27,15 +30,18 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity()
 @Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${application.jwt.token.Signerkey}")
     private String SIGNER_KEY;
+    private final LogoutHandler logoutHandler;
     private final String[] PUBLIC_ENDPOINTS = {
             "/users/signup",
             "/users/login",
             "/auth/introspect",
-            "/users/my-info"
+            "/users/my-info",
+            "/users/logout"
     };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -55,7 +61,15 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
         );
 
-        httpSecurity.csrf(x -> x.disable()); //Turn off CSRF
+//        httpSecurity.csrf(x -> x.disable()); //Turn off CSRF
+
+        //Customize Logout
+        httpSecurity.logout(logout ->
+                logout.logoutUrl("/users/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .invalidateHttpSession(false)
+                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+        );
 
         return httpSecurity.build();
     }
