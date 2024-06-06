@@ -2,15 +2,16 @@ package com.dropchat.cinemaxmovie.service;
 
 import com.dropchat.cinemaxmovie.converter.request.AuthenticationRequest;
 import com.dropchat.cinemaxmovie.converter.request.IntrospectRequest;
+import com.dropchat.cinemaxmovie.converter.request.RefreshTokenRequest;
+import com.dropchat.cinemaxmovie.converter.response.RefreshTokenResponse;
+import com.dropchat.cinemaxmovie.entity.InvalidateToken;
+import com.dropchat.cinemaxmovie.entity.RefreshToken;
 import com.dropchat.cinemaxmovie.exception.ApplicationException;
 import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
 import com.dropchat.cinemaxmovie.converter.response.IntrospectResponse;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
-import com.dropchat.cinemaxmovie.repository.ConfirmEmailRepository;
-import com.dropchat.cinemaxmovie.repository.InvalidatedTokenRepository;
-import com.dropchat.cinemaxmovie.repository.UserRepository;
-import com.dropchat.cinemaxmovie.repository.UserStatusRepository;
+import com.dropchat.cinemaxmovie.repository.*;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,24 +40,47 @@ public class AuthenticationService {
     private final ConfirmEmailRepository confirmEmailRepository;
     private final UserStatusRepository userStatusRepository;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${application.jwt.token.Signerkey}")
     private String SIGNER_KEY;
 
-    public AuthenticationResponse authenticatedLoginUser(@NotNull AuthenticationRequest request){
+    public AuthenticationResponse authenticatedLoginUser(@NotNull AuthenticationRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
-        boolean authenticated =  encoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = encoder.matches(request.getPassword(), user.getPassword());
 
-        if (!authenticated){
+        if (!authenticated) {
             throw new ApplicationException(ErrorCode.USER_INVALID);
         }
 
         var token = generateToken(request.getUsername());
 
+        var refreshToken = refreshTokenService.createRefreshToken(request.getUsername());
+
         return AuthenticationResponse.builder()
                 .token(token)
+                .refreshToken(refreshToken.getToken())
                 .authenticate(true)
+                .build();
+    }
+
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+
+        var currentToken = refreshTokenService.findByToken(request.getToken())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND));
+
+        var accessToken = generateToken(currentToken.getUser().getUsername());
+        var refreshToken = UUID.randomUUID().toString();
+        currentToken.setToken(refreshToken);
+        currentToken.setExpiredTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()));
+
+        refreshTokenRepository.save(currentToken);
+
+        return RefreshTokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -66,7 +91,7 @@ public class AuthenticationService {
 
         try {
             verifyToken(token);
-        }catch (ApplicationException e){
+        } catch (ApplicationException e) {
             isValid = false;
         }
 
@@ -77,10 +102,11 @@ public class AuthenticationService {
 
     /**
      * Method to generate a token when client login success
+     *
      * @param username get client username
      * @return a String token
      */
-    private String generateToken(String username){
+    private String generateToken(String username) {
 
         //Create a JWT Object with header & payload
 
@@ -109,22 +135,22 @@ public class AuthenticationService {
         }
     }
 
-    public MessageResponse verifyEmail(String otp){
+    public MessageResponse verifyEmail(String otp) {
 
         //Find email by OTP Code
         var currentEmail = confirmEmailRepository.findByConfirmCode(otp)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND));
         //Check if email is verified or not
-        if(currentEmail.isConfirm()){
+        if (currentEmail.isConfirm()) {
             return new MessageResponse("Email is already verified");
-        }else if(currentEmail.getExpiredTime().compareTo(new Date()) > 0){
+        } else if (currentEmail.getExpiredTime().compareTo(new Date()) > 0) {
             currentEmail.setConfirm(true);
             currentEmail.getUser().setActive(true);
             currentEmail.getUser().setUserStatus(userStatusRepository.findNameByCode("True")
                     .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)));
             confirmEmailRepository.save(currentEmail);
             return new MessageResponse("Email verified");
-        }else {
+        } else {
             currentEmail.setConfirmCode(currentEmail.getUser().getEmail());
             confirmEmailRepository.save(currentEmail);
             return new MessageResponse("Expired Time! Please regenerate otp and try again");
@@ -142,10 +168,10 @@ public class AuthenticationService {
 
         var verifiedToken = signedJWT.verify(verifier); //(Boolean) Checks the signature of this JWS object with the specified verifier.
 
-        if(!(verifiedToken && exprateTime.after(new Date())))
+        if (!(verifiedToken && exprateTime.after(new Date())))
             throw new ApplicationException(ErrorCode.UNAUTHENTICATED);
 
-        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
             throw new ApplicationException(ErrorCode.UNAUTHENTICATED);
         }
 

@@ -1,5 +1,6 @@
 package com.dropchat.cinemaxmovie.configuration;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,16 +17,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private CustomJWTDecocder jwtDecocder;
+    private final CustomJWTDecocder jwtDecocder;
     private final String[] PUBLIC_ENDPOINTS = {
             "/users/signup",
             "/users/login",
             "/auth/introspect",
             "/users/my-info",
             "/users/logout",
+            "/users/refresh-token"
     };
 
     @Bean

@@ -2,17 +2,17 @@ package com.dropchat.cinemaxmovie.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "RefreshToken")
+@Builder
+@AllArgsConstructor
 public class RefreshToken {
 
     @Id
@@ -24,7 +24,7 @@ public class RefreshToken {
     private String token;
 
     @Column(name = "expiredTime")
-    private LocalDate expiredTime;
+    private Date expiredTime;
 
     @ManyToOne
     @JoinColumn(name = "userId")

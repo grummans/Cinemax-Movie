@@ -19,13 +19,13 @@ import java.text.ParseException;
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class CustomJWTDecocder implements JwtDecoder {
 
     @Value("${application.jwt.token.Signerkey}")
     private String singerKey;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
     private NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override

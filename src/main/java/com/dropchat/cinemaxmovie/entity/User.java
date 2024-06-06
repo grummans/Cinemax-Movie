@@ -73,4 +73,5 @@ public class User {
     @JoinColumn(name = "roleId")
     @JsonBackReference("user-role")
     private Role role;
+
 }

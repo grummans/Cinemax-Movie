@@ -1,10 +1,7 @@
 package com.dropchat.cinemaxmovie.controller;
 
 import com.dropchat.cinemaxmovie.converter.request.*;
-import com.dropchat.cinemaxmovie.converter.response.ApiResponse;
-import com.dropchat.cinemaxmovie.converter.response.AuthenticationResponse;
-import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
-import com.dropchat.cinemaxmovie.converter.response.UserResponse;
+import com.dropchat.cinemaxmovie.converter.response.*;
 import com.dropchat.cinemaxmovie.service.AuthenticationService;
 import com.dropchat.cinemaxmovie.service.UserService;
 import com.nimbusds.jose.JOSEException;
@@ -88,6 +85,11 @@ public class UserController {
         userService.logout(request);
         return ApiResponse.<Void>builder()
                 .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public RefreshTokenResponse refreshTokenUser(@RequestBody RefreshTokenRequest request){
+        return authenticationService.refreshToken(request);
     }
 
     @GetMapping("/{userId}")
