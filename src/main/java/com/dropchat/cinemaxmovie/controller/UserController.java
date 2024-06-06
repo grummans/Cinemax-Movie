@@ -7,6 +7,7 @@ import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
 import com.dropchat.cinemaxmovie.converter.response.UserResponse;
 import com.dropchat.cinemaxmovie.service.AuthenticationService;
 import com.dropchat.cinemaxmovie.service.UserService;
+import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +17,19 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
 @Data
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true)
 @Slf4j
 public class UserController {
 
-    private UserService userService;
-    private AuthenticationService authenticationService;
+    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     //function Signup User
     @PostMapping("/signup")
@@ -44,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/update-role")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public MessageResponse updateRoleUser(@RequestBody UpdateRoleRequest request) {
         return userService.changeRoleUser(request);
     }
@@ -81,8 +83,15 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/logout")
+    ApiResponse<Void> logoutUser(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        userService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
+
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public UserResponse getUser(@PathVariable(value = "userId") int id) {
         return userService.getUserById(id);
     }

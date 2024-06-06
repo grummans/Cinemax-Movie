@@ -8,6 +8,7 @@ import com.dropchat.cinemaxmovie.converter.response.IntrospectResponse;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.ConfirmEmailRepository;
+import com.dropchat.cinemaxmovie.repository.InvalidatedTokenRepository;
 import com.dropchat.cinemaxmovie.repository.UserRepository;
 import com.dropchat.cinemaxmovie.repository.UserStatusRepository;
 import com.nimbusds.jose.*;
@@ -25,6 +26,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class AuthenticationService {
     private final PasswordEncoder encoder;
     private final ConfirmEmailRepository confirmEmailRepository;
     private final UserStatusRepository userStatusRepository;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Value("${application.jwt.token.Signerkey}")
     private String SIGNER_KEY;
@@ -59,20 +62,16 @@ public class AuthenticationService {
     public IntrospectResponse validateTokenUser(IntrospectRequest request) throws JOSEException, ParseException {
 
         var token = request.getToken(); //get Token of user request
+        boolean isValid = true;
 
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes()); //Creates a new Message Authentication (MAC) verifier.
-
-        SignedJWT signedJWT = SignedJWT.parse(token); //Parses a signed JSON Web Token (JWT) from the specified string in compact format
-
-        log.warn(signedJWT.getJWTClaimsSet().getSubject());
-
-        Date exprateTime = signedJWT.getJWTClaimsSet().getExpirationTime(); //Gets the expiration time (exp) claim.
-
-        var verifiedToken = signedJWT.verify(verifier); //(Boolean) Checks the signature of this JWS object with the specified verifier.
-
+        try {
+            verifyToken(token);
+        }catch (ApplicationException e){
+            isValid = false;
+        }
 
         return IntrospectResponse.builder()
-                .valid(verifiedToken && exprateTime.after(new Date())) //Return the result
+                .valid(isValid) //Return the result
                 .build();
     }
 
@@ -89,13 +88,14 @@ public class AuthenticationService {
 
 
         JWTClaimsSet claimNames = new JWTClaimsSet.Builder() //JSON Web Token (JWT) claims set. This class is immutable.
+                .jwtID(UUID.randomUUID().toString())
                 .subject(username) //Sets the subject (sub) claim.
                 .issuer("com.dropchat.JWT") //Sets the issuer (iss) claim.
                 .issueTime(new Date()) //Sets the issued-at (iat) claim.
                 .expirationTime(new Date(Instant.now() //Sets the expiration time (exp) claim.
                         .plus(1, ChronoUnit.HOURS)
                         .toEpochMilli()))
-                .claim("scope",userRepository.findByUsername(username)
+                .claim("scope", userRepository.findByUsername(username)
                         .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND)).getRole().getRoleName())
                 .build();
 
@@ -129,5 +129,26 @@ public class AuthenticationService {
             confirmEmailRepository.save(currentEmail);
             return new MessageResponse("Expired Time! Please regenerate otp and try again");
         }
+    }
+
+
+    protected SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes()); //Creates a new Message Authentication (MAC) verifier.
+
+        SignedJWT signedJWT = SignedJWT.parse(token); //Parses a signed JSON Web Token (JWT) from the specified string in compact format
+
+        Date exprateTime = signedJWT.getJWTClaimsSet().getExpirationTime(); //Gets the expiration time (exp) claim.
+
+        var verifiedToken = signedJWT.verify(verifier); //(Boolean) Checks the signature of this JWS object with the specified verifier.
+
+        if(!(verifiedToken && exprateTime.after(new Date())))
+            throw new ApplicationException(ErrorCode.UNAUTHENTICATED);
+
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+            throw new ApplicationException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return signedJWT;
     }
 }

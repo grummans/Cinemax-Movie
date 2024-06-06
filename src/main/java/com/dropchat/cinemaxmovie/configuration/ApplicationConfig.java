@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 @Slf4j
 public class ApplicationConfig {
 
-
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
@@ -43,4 +42,6 @@ public class ApplicationConfig {
     public HandlerExceptionResolver handlerExceptionResolver() {
         return new DefaultHandlerExceptionResolver();
     }
+
+
 }

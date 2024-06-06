@@ -4,11 +4,13 @@ import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.EntityConverter;
 import com.dropchat.cinemaxmovie.converter.request.*;
 import com.dropchat.cinemaxmovie.converter.response.*;
+import com.dropchat.cinemaxmovie.entity.InvalidateToken;
 import com.dropchat.cinemaxmovie.entity.User;
 import com.dropchat.cinemaxmovie.exception.ApplicationException;
 import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import com.dropchat.cinemaxmovie.repository.*;
 import com.dropchat.cinemaxmovie.util.EmailUtil;
+import com.nimbusds.jose.JOSEException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 
@@ -35,6 +40,7 @@ public class UserService {
     private final AuthenticationService authenticationService;
     private final ConfirmEmailRepository confirmEmailRepository;
     private final ApplicationConfig applicationConfig;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     /**
      * Method register User
@@ -66,6 +72,20 @@ public class UserService {
          //Send Email Verify with OTP
         emailUtil.createConfirmEmail(user);
         return "Please check your mailbox to verify account";
+    }
+
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+        var signedToken = authenticationService.verifyToken(request.getToken());
+
+        String tid = signedToken.getJWTClaimsSet().getJWTID(); //Gets the JWT ID (jti) claim
+        Date expTime = signedToken.getJWTClaimsSet().getExpirationTime(); //Gets the expiration time (exp) claim
+
+        InvalidateToken invalidateToken = InvalidateToken.builder()
+                .id(tid)
+                .expiryTime(expTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidateToken);
     }
 
     public AuthenticationResponse loginUser(AuthenticationRequest request){

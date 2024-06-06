@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface BillTicketRepository extends JpaRepository<BillTicket, Integer> {
-    Optional<BillTicket> findBillTicketByBillsAndTickets(Bill bill, Ticket ticket);
+    Optional<BillTicket> findBillTicketByBillAndTicket(Bill bill, Ticket ticket);
 }

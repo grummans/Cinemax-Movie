@@ -34,7 +34,6 @@ spring:
   main:
     banner-mode: off
     allow-bean-definition-overriding: true
-logging:
   level:
     sql: info
 server:

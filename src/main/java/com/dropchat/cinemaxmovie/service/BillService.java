@@ -105,17 +105,17 @@ public class BillService {
                 var food = foodItem.getFood();
                 if (quantity == 0) {
                     if (billFoodRepository
-                            .findBillFoodByBillsAndFood(current, foodRepository.findById(food).orElseThrow())
+                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
                             .isEmpty()) continue;
                     // If quantity is 0, delete the corresponding BillFood
                     var currentBillFood = billFoodRepository
-                            .findBillFoodByBillsAndFood(current, foodRepository.findById(food).orElseThrow())
+                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
                             .orElseThrow();
                     billFoodRepository.delete(currentBillFood);
                 } else {
                     // Fetch the corresponding BillFood
                     BillFood billFood = billFoodRepository
-                            .findBillFoodByBillsAndFood(current, foodRepository.findById(food).orElseThrow())
+                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
                             .orElse(new BillFood(quantity, current, foodRepository.findById(food).orElseThrow()));
 
                     // Update quantity and save the BillFood
@@ -130,14 +130,14 @@ public class BillService {
                 var ticket = ticketItem.getTicket();
                 if (quantity == 0) {
                     if (billTicketRepository
-                            .findBillTicketByBillsAndTickets(current, ticketRepository.findById(ticket).orElseThrow())
+                            .findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
                             .isEmpty()) continue;
                     var currentBillTicket = billTicketRepository
-                            .findBillTicketByBillsAndTickets(current, ticketRepository.findById(ticket).orElseThrow())
+                            .findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
                             .orElseThrow();
                     billTicketRepository.delete(currentBillTicket);
                 } else {
-                    BillTicket billTicket = billTicketRepository.findBillTicketByBillsAndTickets(current, ticketRepository.findById(ticket).orElseThrow())
+                    BillTicket billTicket = billTicketRepository.findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
                             .orElse(new BillTicket(quantity, current, ticketRepository.findById(ticket).orElseThrow()));
 
                     billTicket.setQuantity(quantity);

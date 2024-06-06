@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface BillFoodRepository extends JpaRepository<BillFood, Integer> {
-    Optional<BillFood> findBillFoodByBillsAndFood(Bill bill, Food food);
+    Optional<BillFood> findBillFoodByBillAndFood(Bill bill, Food food);
 }
