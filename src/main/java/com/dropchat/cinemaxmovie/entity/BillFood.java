@@ -1,7 +1,9 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BillFood {
 
-    //define field for table "BillFood"
+    // define field for table "BillFood"
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +32,7 @@ public class BillFood {
     @JsonBackReference("billFood-food")
     private Food food;
 
-    //define constructor without property id
+    // define constructor without property id
     public BillFood(int quantity, Bill bill, Food food) {
         this.quantity = quantity;
         this.bill = bill;

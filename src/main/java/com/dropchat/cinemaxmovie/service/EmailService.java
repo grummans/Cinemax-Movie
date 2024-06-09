@@ -2,14 +2,13 @@ package com.dropchat.cinemaxmovie.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.boot.autoconfigure.mail.MailSenderValidatorAutoConfiguration;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service("emailService")
 @FieldDefaults(makeFinal = true)
@@ -25,9 +24,9 @@ public class EmailService {
      * @param body Content of email
      * @return
      **/
-    public void sendOTPEmail(String title, String subject, String body){
+    public void sendOTPEmail(String title, String subject, String body) {
 
-        try{
+        try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
@@ -36,10 +35,9 @@ public class EmailService {
             helper.setText(body);
 
             javaMailSender.send(mimeMessage);
-        }catch (MessagingException e){
+        } catch (MessagingException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
 }

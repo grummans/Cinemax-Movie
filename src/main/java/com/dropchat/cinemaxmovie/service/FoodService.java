@@ -1,17 +1,19 @@
 package com.dropchat.cinemaxmovie.service;
 
+import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
 import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.response.SortFoodByQuantity;
 import com.dropchat.cinemaxmovie.entity.Food;
 import com.dropchat.cinemaxmovie.repository.BillFoodRepository;
 import com.dropchat.cinemaxmovie.repository.FoodRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.*;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +28,14 @@ public class FoodService {
     }
 
     public Food remake(Food remakeFood) {
-        var current = foodRepository.findById(remakeFood.getId())
-                .orElseThrow(() -> new RuntimeException("Data not found !"));
+        var current =
+                foodRepository.findById(remakeFood.getId()).orElseThrow(() -> new RuntimeException("Data not found !"));
         BeanUtils.copyProperties(remakeFood, current, config.getNullPropertyNames(remakeFood));
         return foodRepository.save(current);
     }
 
     public Food delete(String name) {
-        var current = foodRepository.findByNameOfFood(name)
-                .orElseThrow(() -> new RuntimeException("Data not found !"));
+        var current = foodRepository.findByNameOfFood(name).orElseThrow(() -> new RuntimeException("Data not found !"));
         billFoodRepository.findAll().forEach(x -> {
             if (x.getFood().getNameOfFood().equals(name)) x.setFood(null);
         });
@@ -52,7 +53,7 @@ public class FoodService {
         // Create a new Date object representing the date 7 days ago
         Date sevenDaysAgo = new Date(sevenDaysAgoMillis);
 
-//
+        //
 
         Map<String, SortFoodByQuantity> foodMap = new HashMap<>();
 

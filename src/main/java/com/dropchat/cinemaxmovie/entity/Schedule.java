@@ -1,15 +1,16 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter
@@ -18,7 +19,7 @@ import java.util.List;
 @Table(name = "Schedule")
 public class Schedule {
 
-    //define field for table "Schedule"
+    // define field for table "Schedule"
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +58,7 @@ public class Schedule {
     @JsonBackReference("schedule-room")
     private Room room;
 
-    //define constructor without property id
+    // define constructor without property id
     public Schedule(double price, LocalDate startAt, LocalDate endAt, String code, String name, boolean isActive) {
         this.price = price;
         this.startAt = startAt;

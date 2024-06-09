@@ -1,12 +1,13 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
 
-import java.util.Date;
+import lombok.*;
 
 @Entity
 @Table(name = "InvalidateToken")
@@ -22,5 +23,4 @@ public class InvalidateToken {
 
     @Column(name = "expiryTime")
     private Date expiryTime;
-
 }

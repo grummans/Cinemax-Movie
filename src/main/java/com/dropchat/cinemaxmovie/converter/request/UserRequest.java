@@ -1,10 +1,8 @@
 package com.dropchat.cinemaxmovie.converter.request;
 
-import com.dropchat.cinemaxmovie.exception.ErrorCode;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

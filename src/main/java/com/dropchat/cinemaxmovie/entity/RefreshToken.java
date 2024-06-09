@@ -1,10 +1,12 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.Date;
+
+import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import lombok.*;
 
 @Entity
 @Getter
@@ -30,5 +32,4 @@ public class RefreshToken {
     @JoinColumn(name = "userId")
     @JsonBackReference("refreshToken-user")
     private User user;
-
 }

@@ -1,5 +1,13 @@
 package com.dropchat.cinemaxmovie.service;
 
+import java.util.Date;
+import java.util.Random;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import com.dropchat.cinemaxmovie.configuration.ApplicationConfig;
 import com.dropchat.cinemaxmovie.converter.request.BillRequest;
 import com.dropchat.cinemaxmovie.converter.response.MessageResponse;
@@ -7,20 +15,15 @@ import com.dropchat.cinemaxmovie.entity.Bill;
 import com.dropchat.cinemaxmovie.entity.BillFood;
 import com.dropchat.cinemaxmovie.entity.BillTicket;
 import com.dropchat.cinemaxmovie.repository.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Date;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class BillService {
+
     private final BillStatusRepository billStatusRepository;
     private final BillTicketRepository billTicketRepository;
     private final PromotionRepository promotionRepository;
@@ -47,10 +50,10 @@ public class BillService {
         bill.setPromotion(promotionRepository.findById(newBill.getPromotion()).orElseThrow());
         billRepository.save(bill);
 
-        var check = billRepository.findByTradingCode(newBill.getTradingCode())
+        var check = billRepository
+                .findByTradingCode(newBill.getTradingCode())
                 .orElseThrow(() -> new RuntimeException("Data not found"));
-        if (check.getUser() == null
-                || check.getBillStatus() == null) {
+        if (check.getUser() == null || check.getBillStatus() == null) {
             billRepository.delete(check);
             log.error("CustomerId and BillStatusId must not be null !");
         }
@@ -59,14 +62,16 @@ public class BillService {
         newBill.getFoodItems().forEach(x -> {
             var quantity = x.getQuantity();
             var food = x.getFood();
-            BillFood newList = new BillFood(quantity, check, foodRepository.findById(food).orElseThrow());
+            BillFood newList =
+                    new BillFood(quantity, check, foodRepository.findById(food).orElseThrow());
             billFoodRepository.save(newList);
         });
 
         newBill.getTicketItems().forEach(x -> {
             var quantity = x.getQuantity();
             var ticket = x.getTicket();
-            BillTicket newList = new BillTicket(quantity, check, ticketRepository.findById(ticket).orElseThrow());
+            BillTicket newList = new BillTicket(
+                    quantity, check, ticketRepository.findById(ticket).orElseThrow());
             billTicketRepository.save(newList);
         });
 
@@ -78,25 +83,25 @@ public class BillService {
     }
 
     private void countMoney(Bill request) {
-        var totalFoodPrice = billFoodRepository.findAll()
-                .stream()
+        var totalFoodPrice = billFoodRepository.findAll().stream()
                 .filter(x -> x.getBill().equals(request))
                 .mapToDouble(x -> x.getQuantity() * x.getFood().getPrice())
                 .sum();
-        var totalTicketPrice = billTicketRepository.findAll()
-                .stream()
+        var totalTicketPrice = billTicketRepository.findAll().stream()
                 .filter(x -> x.getBill().equals(request))
                 .mapToDouble(x -> x.getQuantity() * x.getTicket().getPriceTicket())
                 .sum();
         if (request.getPromotion() == null) {
             request.setTotalMoney(totalTicketPrice + totalFoodPrice);
         } else {
-            request.setTotalMoney((totalTicketPrice + totalFoodPrice) * (1 - request.getPromotion().getPercent() / 100.0));
+            request.setTotalMoney((totalTicketPrice + totalFoodPrice)
+                    * (1 - request.getPromotion().getPercent() / 100.0));
         }
     }
 
     public String remake(BillRequest remakeBill, String request) {
-        var current = billRepository.findById((long) remakeBill.getId())
+        var current = billRepository
+                .findById((long) remakeBill.getId())
                 .orElseThrow(() -> new RuntimeException("Data not found"));
 
         if (remakeBill.getFoodItems() != null) {
@@ -105,18 +110,24 @@ public class BillService {
                 var food = foodItem.getFood();
                 if (quantity == 0) {
                     if (billFoodRepository
-                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
+                            .findBillFoodByBillAndFood(
+                                    current, foodRepository.findById(food).orElseThrow())
                             .isEmpty()) continue;
                     // If quantity is 0, delete the corresponding BillFood
                     var currentBillFood = billFoodRepository
-                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
+                            .findBillFoodByBillAndFood(
+                                    current, foodRepository.findById(food).orElseThrow())
                             .orElseThrow();
                     billFoodRepository.delete(currentBillFood);
                 } else {
                     // Fetch the corresponding BillFood
                     BillFood billFood = billFoodRepository
-                            .findBillFoodByBillAndFood(current, foodRepository.findById(food).orElseThrow())
-                            .orElse(new BillFood(quantity, current, foodRepository.findById(food).orElseThrow()));
+                            .findBillFoodByBillAndFood(
+                                    current, foodRepository.findById(food).orElseThrow())
+                            .orElse(new BillFood(
+                                    quantity,
+                                    current,
+                                    foodRepository.findById(food).orElseThrow()));
 
                     // Update quantity and save the BillFood
                     billFood.setQuantity(quantity);
@@ -130,15 +141,22 @@ public class BillService {
                 var ticket = ticketItem.getTicket();
                 if (quantity == 0) {
                     if (billTicketRepository
-                            .findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
+                            .findBillTicketByBillAndTicket(
+                                    current, ticketRepository.findById(ticket).orElseThrow())
                             .isEmpty()) continue;
                     var currentBillTicket = billTicketRepository
-                            .findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
+                            .findBillTicketByBillAndTicket(
+                                    current, ticketRepository.findById(ticket).orElseThrow())
                             .orElseThrow();
                     billTicketRepository.delete(currentBillTicket);
                 } else {
-                    BillTicket billTicket = billTicketRepository.findBillTicketByBillAndTicket(current, ticketRepository.findById(ticket).orElseThrow())
-                            .orElse(new BillTicket(quantity, current, ticketRepository.findById(ticket).orElseThrow()));
+                    BillTicket billTicket = billTicketRepository
+                            .findBillTicketByBillAndTicket(
+                                    current, ticketRepository.findById(ticket).orElseThrow())
+                            .orElse(new BillTicket(
+                                    quantity,
+                                    current,
+                                    ticketRepository.findById(ticket).orElseThrow()));
 
                     billTicket.setQuantity(quantity);
                     billTicketRepository.save(billTicket);
@@ -156,8 +174,7 @@ public class BillService {
     }
 
     public MessageResponse delete(String name) {
-        var current = billRepository.findByTradingCode(name)
-                .orElseThrow(() -> new RuntimeException("Data not found"));
+        var current = billRepository.findByTradingCode(name).orElseThrow(() -> new RuntimeException("Data not found"));
         current.setActive(false);
         return new MessageResponse("Delete success !");
     }

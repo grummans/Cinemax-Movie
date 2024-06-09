@@ -1,7 +1,9 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +15,7 @@ import lombok.Setter;
 @Table(name = "BillTicket")
 public class BillTicket {
 
-    //define field for table "BillTicket"
+    // define field for table "BillTicket"
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

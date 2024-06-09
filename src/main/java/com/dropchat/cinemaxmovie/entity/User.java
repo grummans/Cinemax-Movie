@@ -1,13 +1,15 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.List;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.*;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import lombok.*;
 
 @Entity
 @Getter
@@ -18,7 +20,7 @@ import java.util.List;
 @Table(name = "User")
 public class User {
 
-    //define field for table "User"
+    // define field for table "User"
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -73,5 +75,4 @@ public class User {
     @JoinColumn(name = "roleId")
     @JsonBackReference("user-role")
     private Role role;
-
 }

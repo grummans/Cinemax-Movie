@@ -1,11 +1,12 @@
 package com.dropchat.cinemaxmovie.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -40,9 +41,15 @@ public class GeneralSetting {
     @Column(name = "timeBeginToChange")
     private LocalDate timeBeginToChange;
 
-    //define constructor without property id;
-    public GeneralSetting(LocalDate breakTime, int businessHours, LocalDate closeTime, double fixedTicketPrice,
-                          int percentDay, int percentWeekend, LocalDate timeBeginToChange) {
+    // define constructor without property id;
+    public GeneralSetting(
+            LocalDate breakTime,
+            int businessHours,
+            LocalDate closeTime,
+            double fixedTicketPrice,
+            int percentDay,
+            int percentWeekend,
+            LocalDate timeBeginToChange) {
         this.breakTime = breakTime;
         this.businessHours = businessHours;
         this.closeTime = closeTime;

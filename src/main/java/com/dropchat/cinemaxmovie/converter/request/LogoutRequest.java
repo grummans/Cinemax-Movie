@@ -10,5 +10,4 @@ import lombok.*;
 public class LogoutRequest {
 
     private String token;
-
 }

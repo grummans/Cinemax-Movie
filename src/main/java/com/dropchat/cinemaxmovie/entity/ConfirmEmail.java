@@ -1,13 +1,14 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.util.Date;
+
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -16,7 +17,7 @@ import java.util.Date;
 @Table(name = "ConfirmEmail")
 public class ConfirmEmail {
 
-    //define field for table "ConfirmEmail"
+    // define field for table "ConfirmEmail"
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -38,5 +39,4 @@ public class ConfirmEmail {
     @JoinColumn(name = "userId")
     @JsonBackReference("confirmEmail-user")
     private User user;
-
 }

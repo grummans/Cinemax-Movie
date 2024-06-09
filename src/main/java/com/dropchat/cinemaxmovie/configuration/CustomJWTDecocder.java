@@ -1,11 +1,9 @@
 package com.dropchat.cinemaxmovie.configuration;
 
-import com.dropchat.cinemaxmovie.converter.request.IntrospectRequest;
-import com.dropchat.cinemaxmovie.service.AuthenticationService;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.text.ParseException;
+import java.util.Objects;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,9 +12,12 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.text.ParseException;
-import java.util.Objects;
+import com.dropchat.cinemaxmovie.converter.request.IntrospectRequest;
+import com.dropchat.cinemaxmovie.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -31,10 +32,9 @@ public class CustomJWTDecocder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
         try {
-            var response = authenticationService.validateTokenUser(IntrospectRequest.builder()
-                    .token(token)
-                    .build());
-            if(!response.isValid()){
+            var response = authenticationService.validateTokenUser(
+                    IntrospectRequest.builder().token(token).build());
+            if (!response.isValid()) {
                 throw new JwtException("Token invalid");
             }
         } catch (JOSEException e) {
@@ -46,8 +46,9 @@ public class CustomJWTDecocder implements JwtDecoder {
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(singerKey.getBytes(), JWSAlgorithm.HS512.toString());
 
-            nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec) //Use the given SecretKey to validate the MAC on a JSON Web Signature (JWS).
-                    .macAlgorithm(MacAlgorithm.HS512) //Use the given algorithm  when generating the MAC
+            nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(
+                            secretKeySpec) // Use the given SecretKey to validate the MAC on a JSON Web Signature (JWS).
+                    .macAlgorithm(MacAlgorithm.HS512) // Use the given algorithm  when generating the MAC
                     .build();
         }
 

@@ -1,7 +1,8 @@
 package com.dropchat.cinemaxmovie.configuration;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.beans.FeatureDescriptor;
+import java.util.stream.Stream;
+
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
-import java.beans.FeatureDescriptor;
-import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 public class ApplicationConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
@@ -42,6 +43,4 @@ public class ApplicationConfig {
     public HandlerExceptionResolver handlerExceptionResolver() {
         return new DefaultHandlerExceptionResolver();
     }
-
-
 }

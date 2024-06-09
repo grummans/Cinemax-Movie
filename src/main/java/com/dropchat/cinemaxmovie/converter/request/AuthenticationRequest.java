@@ -1,6 +1,7 @@
 package com.dropchat.cinemaxmovie.converter.request;
 
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ public class AuthenticationRequest {
 
     @NotBlank
     private String username;
+
     @NotBlank
     private String password;
 }

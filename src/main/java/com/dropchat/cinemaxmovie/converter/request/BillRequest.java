@@ -1,14 +1,14 @@
 package com.dropchat.cinemaxmovie.converter.request;
 
+import java.util.Date;
+import java.util.List;
+
 import com.dropchat.cinemaxmovie.entity.BillStatus;
 import com.dropchat.cinemaxmovie.entity.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -44,5 +44,4 @@ public class BillRequest {
         private int quantity;
         private int ticket;
     }
-
 }

@@ -1,12 +1,14 @@
 package com.dropchat.cinemaxmovie.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.List;
+
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -15,7 +17,7 @@ import java.util.List;
 @Table(name = "BillStatus")
 public class BillStatus {
 
-    //define field for table "BillStatus"
+    // define field for table "BillStatus"
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,7 @@ public class BillStatus {
     @JsonManagedReference("bill-billStatus")
     private List<Bill> bills;
 
-    //define constructor without property id
+    // define constructor without property id
     public BillStatus(String name, List<Bill> bills) {
         this.name = name;
         this.bills = bills;
