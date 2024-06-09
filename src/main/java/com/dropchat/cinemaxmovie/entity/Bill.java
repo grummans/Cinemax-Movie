@@ -3,6 +3,7 @@ package com.dropchat.cinemaxmovie.entity;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -33,13 +34,6 @@ public class Bill {
     @Column(name = "createTime")
     private Date createTime;
 
-    @OneToMany(mappedBy = "bill")
-    private List<BillTicket> billTickets;
-
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
-
     @Column(name = "name")
     private String name;
 
@@ -48,6 +42,15 @@ public class Bill {
 
     @Column(name = "isActive")
     private boolean isActive;
+
+    @OneToMany(mappedBy = "bill")
+    @JsonManagedReference("billTicket-bill")
+    private List<BillTicket> billTickets;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    @JsonBackReference("bill-user")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "promotionId")

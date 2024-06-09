@@ -69,6 +69,6 @@ public class Movie {
 
     @ManyToOne
     @JoinColumn(name = "rateId")
-    @JsonBackReference
+    @JsonBackReference("movie-rate")
     private Rate rate;
 }
