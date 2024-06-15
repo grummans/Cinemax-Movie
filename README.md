@@ -27,14 +27,6 @@ The system is an online showcase of a single-screen cinema.
 + User can sign up/in with confirm email. Also can forgot, reset and change password.
 + The administrator can add a new movie to the schedule, cancel the movie, and review the attendance of the hall, the administator also can CRUD foods, seats, room and cinema. And only administrator can change role user.
 
-## Changelog
-08 April 2024:
-- The entire project was upgraded with lombok annotation.
-- The logic has been moved from the controller to the service.
-- Added email to payment method after choose movie.
-- Added logout system.
-- Much more fixes, corrections, upgrades to clean code.
-
 ## Technologies
 * Java
 * Spring Boot
