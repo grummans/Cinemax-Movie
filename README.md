@@ -1,4 +1,4 @@
-# Cinema Project
+# Cinemax Movie
 
 This project is a web application implementation of a cinema WebApp using Java Servlet API.
 In a nutshell, there are movies and their sessions, which you can search for using filters, then select needed one, choose seats and buy tickets. But first, you should sign up/in.
