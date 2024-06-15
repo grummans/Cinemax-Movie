@@ -14,7 +14,7 @@ Admin can add/remove new movies and movie, food and seat sessions as well.
 ## Introduction
 The system is an online showcase of a single-screen cinema.
 ##### There are 3 roles:
-+ Authorized user
++ User
 + Moderator
 + Administrator
 
