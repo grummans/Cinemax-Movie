@@ -7,7 +7,6 @@ Admin can add/remove new movies and movie, food and seat sessions as well.
 
 ## Table of Contents
 * [Introduction](#introduction)
-* [Changelog](#changelog)
 * [Technologies](#technologies)
 * [Functions](#functions)
 
