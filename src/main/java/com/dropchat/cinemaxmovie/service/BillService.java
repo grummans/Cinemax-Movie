@@ -3,6 +3,8 @@ package com.dropchat.cinemaxmovie.service;
 import java.util.Date;
 import java.util.Random;
 
+import com.dropchat.cinemaxmovie.exception.ApplicationException;
+import com.dropchat.cinemaxmovie.exception.ErrorCode;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class BillService {
 
         var check = billRepository
                 .findByTradingCode(newBill.getTradingCode())
-                .orElseThrow(() -> new RuntimeException("Data not found"));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.DATA_NOT_FOUND));
         if (check.getUser() == null || check.getBillStatus() == null) {
             billRepository.delete(check);
             log.error("CustomerId and BillStatusId must not be null !");
@@ -78,12 +80,13 @@ public class BillService {
         countMoney(check);
         billRepository.save(check);
 
-        String url = request + "/api/v1/payment/submitOrder/" + check.getTradingCode();
+        String url = request + "/payment/submitOrder/" + check.getTradingCode();
         return restTemplate.postForObject(url, null, String.class);
     }
 
     private void countMoney(Bill request) {
-        var totalFoodPrice = billFoodRepository.findAll().stream()
+        var totalFoodPrice = billFoodRepository.findAll()
+                .stream()
                 .filter(x -> x.getBill().equals(request))
                 .mapToDouble(x -> x.getQuantity() * x.getFood().getPrice())
                 .sum();
@@ -169,7 +172,7 @@ public class BillService {
         remakeBill.setUpdateTime(new Date());
         BeanUtils.copyProperties(remakeBill, current, config.getNullPropertyNames(remakeBill));
         billRepository.save(current);
-        String url = request + "/api/v1/payment/submitOrder/" + current.getTradingCode();
+        String url = request + "/payment/submitOrder/" + current.getTradingCode();
         return restTemplate.postForObject(url, null, String.class);
     }
 

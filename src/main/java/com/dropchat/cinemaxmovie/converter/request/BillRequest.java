@@ -26,7 +26,6 @@ public class BillRequest {
     private BillStatus billStatus;
 
     private List<FoodQuantityPair> foodItems;
-
     private List<TicketQuantityPair> ticketItems;
 
     @Getter

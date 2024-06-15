@@ -46,3 +46,13 @@ application:
   jwt:
     token:
       Signerkey: ACus9GXSkhXg3iTEyjO1VTqmYRO7B7KNap0C70Alqf/87ZR9TS1YoCpEvonMzfrb
+payment-gateway:
+  vnPay:
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    returnUrl: /api/v1/payment/vn-pay-callback
+    tmnCode: GD9A2NM6
+    secretKey: TINS2ZHGI8HCNCJDR9LMAR5DGR2MAHPH
+    apiUrl: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+    version: 2.1.0
+    command: pay
+    orderType: other
