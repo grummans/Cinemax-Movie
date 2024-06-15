@@ -39,3 +39,12 @@ The system is an online showcase of a single-screen cinema.
 * Maven
 * Lombok
 * ModelMapper
+
+## Functions
+- Everyone can browse the application without logging into the system.
+- Admin can add, edit and delete the day and time when a particular movie will be playing in the cinema.
+- Non logged in users can register and login to the application.
+- User registration validation: each field must be entered correctly.
+- User must confirm his registration to the e-mail adress he provided.
+- Logged in users can reserveSeatConfiguration seats.
+- User create choose a movie with seats, schedule, cinema and food attached. After that create a bill and user can pay on VNPAY. And after that bill will send to user's email.
